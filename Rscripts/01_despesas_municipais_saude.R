@@ -8,7 +8,7 @@ source('Rscripts/00_funcoes_globais.R')
 options(scipen = 999) # remove notação científica
 
 pop <- read_csv('Temp/populacao_amzl_2001-20.csv') # População - 2001 - 2020
-igpdi <- read_excel('Input/IGP-DI.xlsx') #igp-di média anual
+ipca <- read_excel('Input/ipca_indice.xlsx') #igp-di média anual
 
 # Despesas municipais por função 2004-2018 (pré-pandemia)
 # tabela para unir as duas bases
@@ -93,20 +93,21 @@ write.csv2(base.saude.amzl,'Temp/base_muni_saude_amzl.csv', row.names = F)
 
 
 # Continuar daqui: criar função para automatizar
+# revisar ipca abaixo
 
 # Porto Velho (RO)
 pv.pop <- pop %>% 
   dplyr::filter(cod_muni %in% 1100205)
 
-igpdi.2020 <- igpdi$igp_di_media_anual[26]
+ipca.2020 <- ipca$media_numero_indice_ipca[27]
 
 pv <- base.saude.amzl %>% 
   dplyr::filter(cod_ibge %in% 1100205,
                 despesa %in% '10 - Saúde') %>% 
   left_join(pv.pop) %>% 
-  left_join(igpdi) %>% 
+  left_join(ipca) %>% 
   mutate(valor_per_cap_n = valor/populacao,
-         valor_real = valor*igpdi.2020/igp_di_media_anual,
+         valor_real = valor*ipca.2020/igp_di_media_anual,
          valor_real_per_cap = valor_real/populacao) 
          
 
