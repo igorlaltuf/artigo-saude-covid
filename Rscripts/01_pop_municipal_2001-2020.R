@@ -41,4 +41,5 @@ populacao <- populacao %>%
 populacao$ano<-as.numeric(sub(".", "", populacao$ano))
 
 # exportar csv com dados populacionais
-write.csv(populacao,'Temp/populacao_amzl_2001-20.csv',row.names = F)
+con <- file('Temp/populacao_amzl_2001-20.csv', encoding="UTF-8")
+write.csv(populacao, file = con, row.names = F)

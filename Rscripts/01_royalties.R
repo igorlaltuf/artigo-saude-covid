@@ -1,5 +1,5 @@
 # Receitas via transferências da União - Royalties
-rm(list=ls()) # limpar as variáveis carregadas
+
 source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
@@ -99,8 +99,8 @@ write.csv2(x = dados, file = paste('Temp/', arquivo.csv, sep = ''), row.names = 
 # geobr::lookup_muni('rio de janeiro')[,1] # retorna o código do município pelo nome
 
 # testar função (passar mais de um município)
-amostra <- c(1100205,1500602)
-Dados.Royalties(amostra,'Royalties - CFH')
+# amostra <- c(1100205,1500602)
+# Dados.Royalties(amostra,'Royalties - CFH')
 
 
 # Exemplo de como passar um loop dentro de uma função IMPORTANTE

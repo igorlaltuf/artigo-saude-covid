@@ -16,6 +16,8 @@ covid.amzl <- covid %>%
   mutate(obitos_100_mil_ha = (last_available_deaths/estimated_population) * 100000) %>% 
   classificar.variavel('obitos_100_mil_ha', 'class_obit_100_mil_ha')
 
+write.csv2(covid.amzl, file = 'Temp/covid.amzl.csv', row.names = F)
+
 # quantidade de municípios em cada classe
 x <- covid.amzl %>% 
   group_by(class_obit_100_mil_ha) %>%
@@ -95,11 +97,11 @@ lista.cidades <- c(1100205,1500602,1504208,1505536,1502152,1505304,1503903,13026
 shape.muni.amzl %>% dplyr::filter(city_ibge_code %in% lista.cidades)
 
 # Taxa de Mortalidade 
-teste <- covid %>% 
+tx.mortalidade <- covid %>% 
   dplyr::select(city_ibge_code,city,date,last_available_deaths,last_available_confirmed,estimated_population) %>% 
   dplyr::filter(city_ibge_code %in% cidades.amazonia.legal &
                   date == '2021-08-12') %>% 
   mutate(tx_mortalidade = (last_available_deaths/last_available_confirmed)*100) %>% 
-  classificar.variavel('tx_mortalidade', 'tx_mortalidade_class') %>% 
-  dplyr::filter(city_ibge_code %in% lista.cidades)
-
+  classificar.variavel('tx_mortalidade', 'tx_mortalidade_class') %>%   
+  dplyr::filter(city_ibge_code %in% lista.cidades) %>% 
+  arrange(desc(tx_mortalidade))

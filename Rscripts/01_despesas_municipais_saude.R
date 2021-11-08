@@ -1,6 +1,6 @@
 # Despesas municipais com saúde na Amazônia Legal - Despesas empenhadas
 # Dados disponíveis até 2012 são sobre as receitas empenhadas. Por isso devo filtrar apenas essas receitas para os anos posteriores.
-rm(list=ls()) # limpar as variáveis carregadas
+
 source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
@@ -203,8 +203,8 @@ Saude.Muni <- function(codigo_municipio, tipo_despesa){
 
 
 # falta apenas melhorar o alinhamento de títulos, fontes etc
-amostra <- c(1100205,1500602)
-Saude.Muni(amostra,'10 - Saúde')
+# amostra <- c(1100205,1500602)
+# Saude.Muni(amostra,'10 - Saúde')
 
 # estabelecer metas para essa semana (DATASUS, receitas? etc)
 # filtrar a AMZL quando fizer a correlação, remover zeros
