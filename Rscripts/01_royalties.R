@@ -50,10 +50,10 @@ if (!nrow(dados) > 0) return (paste("Erro: nenhum resultado para o município c�
 
 # gerar gráfico
 grafico.royalties <- ggplot() +
-  geom_line(dados, mapping = aes(x = ano, y = valor_consolidado / em_milhoes), col = 'blue') +
-  geom_line(dados, mapping = aes(x = ano, y = valor_real / em_milhoes), col = 'red') +
-  ggtitle(paste("Royalties", titulo.roy ,"recebidos pela prefeitura de",label.muni)) +
-  labs(y = 'Valor dos Royalties (em R$ milhões)', x = 'Ano', caption = 'Fonte: Elaboração própria. Tesouro Nacional (2021).  Valor real deflacionado pela média do IPCA de 2020.') +
+  #geom_line(dados, mapping = aes(x = ano, y = valor_consolidado / em_milhoes), col = 'blue') +
+  geom_line(dados, mapping = aes(x = ano, y = valor_real / em_milhoes), col = 'black') +
+  ggtitle(paste("Royalties", titulo.roy ,"recebidos pela prefeitura de",label.muni, "\n(em valores de 2020)")) +
+  labs(y = 'Valor dos Royalties (em R$ milhões)', x = 'Ano', caption = 'Fonte: Elaboração própria. Tesouro Nacional (2021). Valor real deflacionado pela média do IPCA de 2020.') +
   theme_classic()+
   theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
         plot.title = element_text(hjust = 0.5))

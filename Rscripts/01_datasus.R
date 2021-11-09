@@ -56,7 +56,7 @@ Estab.Muni <- function(codigo_municipio){
   
   # gerar gráfico
   grafico.estabelecimentos <- ggplot() +
-    geom_bar(dados, mapping = aes(x = ano, y = n), col = 'blue', stat = 'identity') +
+    geom_bar(dados, mapping = aes(x = ano, y = n), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
     ggtitle(paste("Hospitais vinculados ao SUS com gestão\nmunicipal, estadual ou dupla - ", label.muni)) +
     labs(y = 'Quantidade de hospitais', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
     theme_classic()+
@@ -121,7 +121,7 @@ Leitos.Muni <- function(codigo_municipio){
     
     # gerar gráfico qtd leitos
     grafico.leitos <- ggplot() +
-      geom_bar(dados, mapping = aes(x = ano, y = leitos_sus), col = 'blue', stat = 'identity') +
+      geom_bar(dados, mapping = aes(x = ano, y = leitos_sus), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
       ggtitle(paste("Evolução dos leitos do SUS - ", label.muni)) +
       labs(y = 'Quantidade de leitos', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
       theme_classic()+
@@ -135,7 +135,7 @@ Leitos.Muni <- function(codigo_municipio){
    
     # leitos do sus cada 100 mil hab (independentemente se é municipal ou não)
     grafico.leitos.pop <- ggplot() +
-      geom_bar(dados, mapping = aes(x = ano, y = leitos_cada_100_mil_ha), col = 'blue', stat = 'identity') +
+      geom_bar(dados, mapping = aes(x = ano, y = leitos_cada_100_mil_ha), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
       ggtitle(paste("Evolução dos leitos do SUS a cada 100 mil habitantes - ", label.muni)) +
       labs(y = 'Quantidade de leitos a\ncada 100 mil habitantes', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
       theme_classic()+
@@ -244,7 +244,7 @@ Medicos.Muni <- function(codigo_municipio){
     
     # qts médicos por município
     grafico.medico <- ggplot() +
-      geom_bar(dados.muni, mapping = aes(x = ano, y = qtd_med_sus), col = 'blue', stat = 'identity') +
+      geom_bar(dados.muni, mapping = aes(x = ano, y = qtd_med_sus), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
       ggtitle(paste("Evolução da quantidade de médicos vinculados ao SUS - \n", label.muni)) +
       labs(y = 'Quantidade de médicos', x = 'Ano', caption = 'Fonte: Elaboração própria. DataSUS(2021).') +
       theme_classic()+
@@ -256,7 +256,7 @@ Medicos.Muni <- function(codigo_municipio){
     
     # qts médicos a cada 100 mil habitantes por município
     grafico.med.100.mil <- ggplot() +
-      geom_bar(dados.muni, mapping = aes(x = ano, y = med_sus_100_mil_hab), col = 'blue', stat = 'identity') +
+      geom_bar(dados.muni, mapping = aes(x = ano, y = med_sus_100_mil_hab), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
       ggtitle(paste("Evolução da quantidade de médicos vinculados \n ao SUS a cada 100 mil habitantes -", label.muni)) +
       labs(y = 'Quantidade de médicos a cada\n100 mil habitantes', x = 'Ano', caption = 'Fonte: Elaboração própria. DataSUS(2021).') +
       theme_classic()+
