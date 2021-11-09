@@ -15,7 +15,7 @@ cidades.intermediadoras <- c('1100023','1100122','1100205','1200401','1200203','
                             '1506807','1600303','1600501','1702109','1709500','1721000','2101202','2109908','2109106',
                             '2105302','2103000','5102504','5101803','5107602','5103403','5107909')
 
-cidades.inter.6.dig <- as.numeric(str_sub(cidades.intermediadoras, end=-2)) # cod intermediadoras sem dígito verificador
+cidades.inter.6.dig <- as.numeric(str_sub(cidades.intermediadoras, end = -2)) # cod intermediadoras sem dÃ­gito verificador
 
 # Estados
 uf.amz.legal <- c('AC','RR','AM','RO','PA','AP','MA','TO','MT')

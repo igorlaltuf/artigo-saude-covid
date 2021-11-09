@@ -1,17 +1,17 @@
-# Receitas via transferÃªncias da UniÃ£o - Royalties
+# Receitas via transferências da União - Royalties
 
 source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
 
-options(scipen = 999) # remove notaÃ§Ã£o cientÃ­fica
+options(scipen = 999) # remove a notação científica
 ipca <- read_excel('Input/ipca_indice.xlsx')
 ipca.2020 <- ipca$media_numero_indice_ipca[27]
 
-# Royalties de mineraÃ§Ã£o, energia e petrÃ³leo (exclui FEP) de 1990 atÃ© 2020
-royalties <- read_csv2('Input/transferencias_para_municÃ­pios_1990_2020_utf8.csv') %>% 
+# Royalties de mineração, energia e petróleo (exclui FEP) de 1990 até 2020
+royalties <- read_csv2('Input/transferencias_para_municípios_1990_2020_utf8.csv') %>% 
   janitor::clean_names() %>% 
-  mutate(valor_consolidado = as.numeric(gsub('[[:punct:] ]+','', substr(valor_consolidado, 3, 100)))/100) %>%  # remove o R$, ponto e vÃ­rgula da string, converte em nÃºmero e divide por 100 p/ incluir decimal
+  mutate(valor_consolidado = as.numeric(gsub('[[:punct:] ]+','', substr(valor_consolidado, 3, 100)))/100) %>%  # remove o R$, ponto e vírgula da string, converte em número e divide por 100 p/ incluir decimal
   dplyr::filter(!transferencia %in% c('Royalties - FEP', 'Royalties - PEA')) %>%  # exclui estas duas categorias
   left_join(ipca) %>% 
   mutate(valor_real = valor_consolidado * ipca.2020 / media_numero_indice_ipca) %>% # deflacionar
@@ -22,38 +22,38 @@ write.csv2(royalties,'Temp/base_royalties_amzl.csv', row.names = F)
 
 unique(royalties$transferencia) # tipos de royalties
 
-# funÃ§Ã£o que gera grÃ¡ficos dos Royalties
+# função que gera gráficos dos Royalties
 Dados.Royalties <- function(codigo_municipio, tipo) {
   for(i in codigo_municipio) { # permite passar mais de um argumento
   
   dados <- royalties %>% 
     dplyr::filter(codigo_ibge %in% i,
                   transferencia %in% tipo)
-# check da funÃ§Ã£o
-if (!nrow(dados) > 0) return (paste("Erro: nenhum resultado para o municÃ­pio cÃ³digo", i,"ou valores referentes aos", tipo))
+# check da função
+if (!nrow(dados) > 0) return (paste("Erro: nenhum resultado para o município/código", i,"ou valores referentes aos", tipo))
 
-# automatizar criaÃ§Ã£o de diretÃ³rios e tÃ­tulos do grÃ¡fico e da tabela
+# automatizar criação de diretórios e do título dos gráficos e tabelas
   label.muni <- cidades.brasil.nome %>% 
     dplyr::filter(cod_muni %in% i) 
   
   label.muni <- cidades.brasil.nome[cidades.brasil.nome$cod_muni == i,2] # transformar em vetor ver regic script
   label.muni <- label.muni$muni # transforma em vetor
-  label.muni <- as.character(str_replace_all(label.muni,"[[:punct:]]","")) # essa vari?vel deve receber o nome da cidade de acordo com o c?digo colocado
-  titulo.roy <- ifelse(tipo == "Royalties - CFM", "da mineraÃ§Ã£o",
-                       ifelse(tipo == "Royalties - ANP", "do petrÃ³leo",
-                              ifelse(tipo == "Royalties - CFH", "da geraÃ§Ã£o de energia elÃ©trica", "ERRO")))    
-  arquivo.grafico <- paste('GrÃ¡fico - royalties',titulo.roy,'de',label.muni,'.png')
+  label.muni <- as.character(str_replace_all(label.muni,"[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
+  titulo.roy <- ifelse(tipo == "Royalties - CFM", "da mineração",
+                       ifelse(tipo == "Royalties - ANP", "do petróleo",
+                              ifelse(tipo == "Royalties - CFH", "da geração de energia elétrica", "ERRO")))    
+  arquivo.grafico <- paste('Gráfico - royalties',titulo.roy,'de',label.muni,'.png')
   arquivo.tabela <- paste('Tabela - royalties',titulo.roy,'de',label.muni,'.png')
   arquivo.csv <- paste('royalties de ', label.muni,'.csv', sep = '')
   diretorio <- paste0('Outputs/dados por municipio/',label.muni)
   dir.create(diretorio)
 
-# gerar grÃ¡fico
+# gerar gráfico
 grafico.royalties <- ggplot() +
   #geom_line(dados, mapping = aes(x = ano, y = valor_consolidado / em_milhoes), col = 'blue') +
   geom_line(dados, mapping = aes(x = ano, y = valor_real / em_milhoes), col = 'black') +
   ggtitle(paste("Royalties", titulo.roy ,"recebidos pela prefeitura de",label.muni, "\n(em valores de 2020)")) +
-  labs(y = 'Valor dos Royalties (em R$ milhÃµes)', x = 'Ano', caption = 'Fonte: ElaboraÃ§Ã£o prÃ³pria. Tesouro Nacional (2021). Valor real deflacionado pela mÃ©dia do IPCA de 2020.') +
+  labs(y = 'Valor dos Royalties (em R$ milhões)', x = 'Ano', caption = 'Fonte: Elaboração própria. Tesouro Nacional (2021). Valor real deflacionado pela média do IPCA de 2020.') +
   theme_classic()+
   theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
         plot.title = element_text(hjust = 0.5))
@@ -61,7 +61,7 @@ grafico.royalties <- ggplot() +
 # gerar tabela
 tabela.royalties <- gt(dados) %>%
   cols_label(
-    municipio = 'MunicÃ­pio',
+    municipio = 'Município',
     ano = 'Ano',
     valor_consolidado = 'Valor Nominal',
     valor_real = 'Valor Real'
@@ -85,7 +85,7 @@ tabela.royalties <- gt(dados) %>%
   cols_align(
     align = 'center'
   ) %>% 
-  tab_source_note('Fonte: ElaboraÃ§Ã£o prÃ³pria. Tesouro Nacional (2021). Valor real deflacionado pela mÃ©dia do IPCA de 2020.')
+  tab_source_note('Fonte: Elaboração própria. Tesouro Nacional (2021). Valor real deflacionado pela média do IPCA de 2020.')
 
 # salvar
 ggsave(plot = grafico.royalties, path = diretorio, filename = arquivo.grafico, width = 9, height = 6)
@@ -95,46 +95,6 @@ write.csv2(x = dados, file = paste('Temp/', arquivo.csv, sep = ''), row.names = 
 }
 }
 
-
-# geobr::lookup_muni('rio de janeiro')[,1] # retorna o cÃ³digo do municÃ­pio pelo nome
-
-# testar funÃ§Ã£o (passar mais de um municÃ­pio)
-# amostra <- c(1100205,1500602)
-# Dados.Royalties(amostra,'Royalties - CFH')
-
-
-# Exemplo de como passar um loop dentro de uma funÃ§Ã£o IMPORTANTE
-# Dados.Royalties <- function(codigo_municipio, tipo) {
-#   for(i in codigo_municipio) { # permite passar mais de um argumento
-#     
-#     dados <- royalties %>% 
-#       dplyr::filter(codigo_ibge %in% i,
-#                     transferencia %in% tipo)
-# 
-# }}
-# amostra <- c(1100205,1500602)
-# Dados.Royalties(amostra,'Royalties - CFH')
-
-
-
-# ao aumento dos royalties Ã© acompanhado por um aumento na mesma magnitude na saÃºde? Comparar antes e depois dos royalties
-# Debug a funÃ§Ã£o https://www.youtube.com/watch?v=x7BdImJ6loA
-# debug(Dados.Royalties)
-# Dados.Royalties(1100205,'Royalties - CFH') # rodar para debugar depois de rodar o debug()
-
-# continuar daqui (analisar dados, ou melhor, a evoluÃ§Ã£o das cidades)
-
-# AnÃ¡lises de casos: 
-# Porto Velho (RO) - Royalties CFH
-# Altamira (PA) - Royalties CFH
-# MarabÃ¡ (PA) - Royalties CFM
-# Parauapebas (PA) - Royalties CFM
-# CanaÃ£ dos CarajÃ¡s (PA) - Royalties CFM
-# OriximinÃ¡ (PA) - Royalties CFM
-# Juruti (PA) - Royalties CFM
-# Manaus (AM) - Royalties CFM
-# OurilÃ¢ndia do Norte (PA) - Royalties CFM
-# Itaituba (PA) - Royalties CFM
-
-
-
+# geobr::lookup_muni('rio de janeiro')[,1] # retorna o código do município pelo nome
+ amostra <- c(1100205,1500602)
+ Dados.Royalties(amostra,'Royalties - CFH')

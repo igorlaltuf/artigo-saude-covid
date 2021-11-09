@@ -1,4 +1,4 @@
-# Dados de saÃºde pÃºblica - DataSUS
+# Dados de Saúde Pública - DataSUS
 
 # carregar scripts
 source('Rscripts/00_bibliotecas.R')
@@ -6,7 +6,7 @@ source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
 
 # dados populacionais
-pop <- read_csv('Temp/populacao_amzl_2001-20.csv') # PopulaÃ§Ã£o - 2001 - 2020
+pop <- read_csv('Temp/populacao_amzl_2001-20.csv') # População - 2001 - 2020
 
 
 # Pacote microdatasus
@@ -16,7 +16,7 @@ var.cnes.st <- c('CNES','CODUFMUN','COD_CEP','VINC_SUS','TPGESTAO','TP_UNID','TU
                  'GESPRG1M','GESPRG2E','GESPRG2M','GESPRG4E','GESPRG4M','GESPRG5E','GESPRG5M', 
                  'GESPRG6E','GESPRG6M','NIVATE_A','NIVATE_H','URGEMERG')
 ano <- 2005 # ano inicial
-mes <- 12 # mÃªs em que os dados serÃ£o coletados
+mes <- 12 # mês em que os dados serão coletados
 while(ano <= 2020){
   dados <- fetch_datasus(year_start = ano ,
                          year_end = ano, 
@@ -35,30 +35,31 @@ dados.st <- do.call(rbind, lapply(paste0("estabelec.", 2005:2020),get)) %>%
 
 # unique(dados.st$tpgestao)
 
-# FunÃ§Ã£o que retorna os dados # cÃ³digo do municÃ­pio apenas com 6 dÃ­gitos
-# FunÃ§Ã£o que retorna a evoluÃ§Ã£o da quantidade de hospitais municipais e estaduais
+# Função que retorna os dados: usar o código do município com apenas com 6 dígitos
+# Função que retorna a evolução da quantidade de hospitais municipais e estaduais
+
 Estab.Muni <- function(codigo_municipio){
   for(i in codigo_municipio){
   dados <- dados.st %>% 
     dplyr::filter(codufmun %in% i,
-                  nivate_h == 1, # sobre o atendimento: Tem atendimento hospitalar municipal ou estadual? exclui farmÃ¡cias etc
-                  tpgestao %in% c('M','E','D'), # M, E ou D (dupla) administraÃ§Ã£o municipal, estadual ou dupla
+                  nivate_h == 1, # sobre o atendimento: Tem atendimento hospitalar municipal ou estadual? exclui farmácias etc
+                  tpgestao %in% c('M','E','D'), # M, E ou D (dupla) administração municipal, estadual ou dupla
                   vinc_sus == 1) %>%  # vinculados ao SUS
     group_by(ano) %>% 
     count()
   
   label.muni <- cidades.brasil.nome[substr(cidades.brasil.nome$cod_muni,1,6) == i,2] # transformar em vetor ver regic script
   label.muni <- label.muni$muni # transforma em vetor
-  label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa vari?vel deve receber o nome da cidade de acordo com o c?digo colocado
+  label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
   arquivo.hospitais <- paste('Hosp muni e est em ', label.muni,'.png')
   diretorio <- paste0('Outputs/dados por municipio/',label.muni)
   dir.create(diretorio)
   
-  # gerar grÃ¡fico
+  # gerar  gráfico
   grafico.estabelecimentos <- ggplot() +
     geom_bar(dados, mapping = aes(x = ano, y = n), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
-    ggtitle(paste("Hospitais vinculados ao SUS com gestÃ£o\nmunicipal, estadual ou dupla - ", label.muni)) +
-    labs(y = 'Quantidade de hospitais', x = 'Ano', caption = 'Fonte: ElaboraÃ§Ã£o prÃ³pria. SALDANHA Et al.(2019).') +
+    ggtitle(paste("Hospitais vinculados ao SUS com gestão\nmunicipal, estadual ou dupla - ", label.muni)) +
+    labs(y = 'Quantidade de hospitais', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
     theme_classic()+
     theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
           plot.title = element_text(hjust = 0.5))+
@@ -71,15 +72,15 @@ Estab.Muni <- function(codigo_municipio){
   }}
 
 
-# amostra <- c(110020,150060) # Lembrar que o cÃ³digo aqui Ã© de 6 dÃ­gitos
+# amostra <- c(110020,150060) # Lembrar que o código aqui é de 6 dígitos
 # Estab.Muni(amostra)
 
 
-# 2 - Dados de leitos (2005 - 2020) - valores para todos os leitos, e nÃ£o apenas os leitos de internaÃ§Ã£o.
+# 2 - Dados de leitos (2005 - 2020) - valores para todos os leitos, e não apenas os leitos de internação.
 
 var.cnes.lt <- c('CNES','CODUFMUN','TP_UNID','TP_LEITO','CODLEITO','QT_EXIST','QT_CONTR','QT_SUS','QT_NSUS')
 ano <- 2005 # ano inicial
-mes <- 12 # mÃªs em que os dados serÃ£o coletados
+mes <- 12 # mês em que os dados serão coletados
 while(ano <= 2020){
   dados <- fetch_datasus(year_start = ano ,
                          year_end = ano,
@@ -113,17 +114,17 @@ Leitos.Muni <- function(codigo_municipio){
     
     label.muni <- cidades.brasil.nome[substr(cidades.brasil.nome$cod_muni,1,6) == i,2] # transformar em vetor ver regic script
     label.muni <- label.muni$muni # transforma em vetor
-    label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa vari?vel deve receber o nome da cidade de acordo com o c?digo colocado
+    label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
     arquivo.leitos <- paste('Leitos do SUS em ', label.muni,'.png')
     arquivo.leitos.pop <- paste('Leitos do SUS 100 mil hab ', label.muni,'.png')
     diretorio <- paste0('Outputs/dados por municipio/',label.muni)
     dir.create(diretorio)
     
-    # gerar grÃ¡fico qtd leitos
+    # gerar gráfico qtd leitos
     grafico.leitos <- ggplot() +
       geom_bar(dados, mapping = aes(x = ano, y = leitos_sus), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
-      ggtitle(paste("EvoluÃ§Ã£o dos leitos do SUS - ", label.muni)) +
-      labs(y = 'Quantidade de leitos', x = 'Ano', caption = 'Fonte: ElaboraÃ§Ã£o prÃ³pria. SALDANHA Et al.(2019).') +
+      ggtitle(paste("Evolução dos leitos do SUS - ", label.muni)) +
+      labs(y = 'Quantidade de leitos', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
       theme_classic()+
       theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
             plot.title = element_text(hjust = 0.5))+
@@ -133,11 +134,11 @@ Leitos.Muni <- function(codigo_municipio){
     ggsave(plot = grafico.leitos, path = diretorio, filename = arquivo.leitos, width = 9, height = 6)
     
    
-    # leitos do sus cada 100 mil hab (independentemente se Ã© municipal ou nÃ£o)
+    # leitos do sus cada 100 mil hab (independentemente se são do município ou não)
     grafico.leitos.pop <- ggplot() +
       geom_bar(dados, mapping = aes(x = ano, y = leitos_cada_100_mil_ha), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
-      ggtitle(paste("EvoluÃ§Ã£o dos leitos do SUS a cada 100 mil habitantes - ", label.muni)) +
-      labs(y = 'Quantidade de leitos a\ncada 100 mil habitantes', x = 'Ano', caption = 'Fonte: ElaboraÃ§Ã£o prÃ³pria. SALDANHA Et al.(2019).') +
+      ggtitle(paste("Evolução dos leitos do SUS a cada 100 mil habitantes - ", label.muni)) +
+      labs(y = 'Quantidade de leitos a\ncada 100 mil habitantes', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
       theme_classic()+
       theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
             plot.title = element_text(hjust = 0.5))+
@@ -152,7 +153,7 @@ Leitos.Muni <- function(codigo_municipio){
 #debug(Leitos.Muni)
 
 
-# 3 - Dados de mÃ©dicos do sus (2005 - 2020)
+# 3 - Dados de médicos do sus (2005 - 2020)
 # url <- "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/"
 
 cbo.2002 <- read.csv2('Input/CBO2002 - Ocupacao.csv') %>%   
@@ -162,7 +163,7 @@ cbo.2002 <- read.csv2('Input/CBO2002 - Ocupacao.csv') %>%
   mutate(codigo = as.character(codigo)) 
   
 cbo.1994 <- read.csv2('Input/cbo94-datasus.csv', encoding = 'UTF-8') %>%     
-  filter(str_detect(profissao, "MÃ©dico|Medicos")) 
+  filter(str_detect(profissao, "Médico|Medicos")) 
 
 cbo.2007.10 <- read.csv2('Input/cbo2007-10-conv.csv', encoding = 'UTF-8') 
 
@@ -171,7 +172,7 @@ lista.de.arquivos <- list.files(path = "Input/CNES-PF/", recursive = TRUE,
                                 pattern = "\\.dbc$", 
                                 full.names = TRUE)
 
-# dados do mÃªs de dezembro para cada ano de 2006 a 2020
+# dados do mês de dezembro para cada ano de 2006 a 2020
 # ano <- c(2006:2020)
 marc <- c(1:135)
 i <- 1
@@ -188,29 +189,29 @@ while (i<=length(lista.de.arquivos)) {
     mutate(ano = as.numeric(substr(competen,1,4))) %>% 
     select(codufmun, ano, tpgestao, cbo, prof_sus)
 
-  # classificaÃ§Ã£o pela cbo94
+  # classificação pela cbo94
   ano.2006 <- x %>%
-    dplyr::filter(cbo %in% cbo.1994$cod_cbo_94) %>% # filtrar cargos de mÃ©dicos independente da especializaÃ§Ã£o
+    dplyr::filter(cbo %in% cbo.1994$cod_cbo_94) %>% # filtrar cargos de médicos independente da especialização
     group_by(codufmun, ano) %>%
     summarise(qtd_med_sus = sum(prof_sus)) %>%
-    left_join(pop, by = c('ano', 'codufmun' = 'cod_muni')) %>%    # continuar daqui!
+    left_join(pop, by = c('ano', 'codufmun' = 'cod_muni')) %>%    
     mutate(med_sus_100_mil_hab = (qtd_med_sus/populacao)*100000)
 
-  # ClassificaÃ§Ã£o segundo a Tabela de ConversÃ£o da ClassificaÃ§Ã£o Brasileira de OcupaÃ§Ã£o 
-  # disponibilizada pelo MinistÃ©rio do Trabalho e Emprego (MTE).
+  # classificação segundo a Tabela de conversão da classificação Brasileira de Ocupações 
+  # disponibilizada pelo Ministério do Trabalho e Emprego (MTE).
   # http://www.sbpc.org.br/upload/noticias_setor/320110927123631.pdf
   anos2007.2010 <- x %>%
-    dplyr::filter(cbo %in% cbo.2007.10$cod_antigo) %>% # filtrar cargos de mÃ©dicos independente da especializaÃ§Ã£o
-    group_by(codufmun, ano) %>% # usar tpgestao aqui para saber os mÃ©dicos do municÃ­pio, estado ou duplo
+    dplyr::filter(cbo %in% cbo.2007.10$cod_antigo) %>% # filtrar cargos de médicos independente da especialização
+    group_by(codufmun, ano) %>% # usar tpgestao aqui para saber os médicos do municipio, estado ou duplo
     summarise(qtd_med_sus = sum(prof_sus)) %>%
-    left_join(pop, by = c('ano', 'codufmun' = 'cod_muni')) %>%    # continuar daqui!
+    left_join(pop, by = c('ano', 'codufmun' = 'cod_muni')) %>%    
     mutate(med_sus_100_mil_hab = (qtd_med_sus/populacao)*100000)
   
   anos2011.2020 <- x %>%
-    dplyr::filter(cbo %in% cbo.2002$codigo) %>% # filtrar cargos de mÃ©dicos independente da especializaÃ§Ã£o
+    dplyr::filter(cbo %in% cbo.2002$codigo) %>% # filtrar cargos de médicos independente da especialização
     group_by(codufmun, ano) %>%
     summarise(qtd_med_sus = sum(prof_sus)) %>%
-    left_join(pop, by = c('ano', 'codufmun' = 'cod_muni')) %>%    # continuar daqui!
+    left_join(pop, by = c('ano', 'codufmun' = 'cod_muni')) %>%   
     mutate(med_sus_100_mil_hab = (qtd_med_sus/populacao)*100000)
 
   x <- rbind(ano.2006, anos2007.2010, anos2011.2020)
@@ -221,13 +222,8 @@ while (i<=length(lista.de.arquivos)) {
 
 dados <- do.call(rbind, lapply(paste0("cnes.pf.",1:135),get))
 
-# cidades.brasil.nome$cod_muni <- as.numeric(substr(cidades.brasil.nome$cod_muni,1,6)) %>% 
-#   rename('muni' = 'cidade')
 
-# dados <- left_join(dados, cidades.amazonia.legal.nome, by = c('codufmun' = 'cod_muni'))  
-#   select(9,4,1,6,2,7,3,8)
-    
-# mÃ©dicos do sus por municÃ­pio (estadual, municipal ou dupla)
+# médicos do sus por município (estadual, municipal ou dupla)
 Medicos.Muni <- function(codigo_municipio){
   for(i in codigo_municipio){
     
@@ -236,17 +232,17 @@ Medicos.Muni <- function(codigo_municipio){
    
     label.muni <- cidades.brasil.nome[substr(cidades.brasil.nome$cod_muni,1,6) == i,2] # transformar em vetor ver regic script
     label.muni <- label.muni$muni # transforma em vetor
-    label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa vari?vel deve receber o nome da cidade de acordo com o c?digo colocado
-    arquivo.med <- paste('MÃ©dicos do SUS', label.muni,'.png')
-    arquivo.med.pop <- paste('MÃ©dicos do SUS 100 mil hab ', label.muni,'.png')
+    label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
+    arquivo.med <- paste('Médicos do SUS', label.muni,'.png')
+    arquivo.med.pop <- paste('Médicos do SUS 100 mil hab ', label.muni,'.png')
     diretorio <- paste0('Outputs/dados por municipio/',label.muni)
     dir.create(diretorio)
     
-    # qts mÃ©dicos por municÃ­pio
+    # qts médicos por município
     grafico.medico <- ggplot() +
       geom_bar(dados.muni, mapping = aes(x = ano, y = qtd_med_sus), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
-      ggtitle(paste("EvoluÃ§Ã£o da quantidade de mÃ©dicos vinculados ao SUS - \n", label.muni)) +
-      labs(y = 'Quantidade de mÃ©dicos', x = 'Ano', caption = 'Fonte: ElaboraÃ§Ã£o prÃ³pria. DataSUS(2021).') +
+      ggtitle(paste("Evolução da quantidade de médicos vinculados ao SUS - \n", label.muni)) +
+      labs(y = 'Quantidade de médicos', x = 'Ano', caption = 'Fonte: Elaboração própria. DataSUS(2021).') +
       theme_classic()+
       theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
             plot.title = element_text(hjust = 0.5))+
@@ -254,11 +250,11 @@ Medicos.Muni <- function(codigo_municipio){
     
     #grafico.medico 
     
-    # qts mÃ©dicos a cada 100 mil habitantes por municÃ­pio
+    # qts médicos a cada 100 mil habitantes por município
     grafico.med.100.mil <- ggplot() +
       geom_bar(dados.muni, mapping = aes(x = ano, y = med_sus_100_mil_hab), col = '#4E84C4', fill = '#4E84C4', stat = 'identity') +
-      ggtitle(paste("EvoluÃ§Ã£o da quantidade de mÃ©dicos vinculados \n ao SUS a cada 100 mil habitantes -", label.muni)) +
-      labs(y = 'Quantidade de mÃ©dicos a cada\n100 mil habitantes', x = 'Ano', caption = 'Fonte: ElaboraÃ§Ã£o prÃ³pria. DataSUS(2021).') +
+      ggtitle(paste("Evolução da quantidade de médicos vinculados \n ao SUS a cada 100 mil habitantes -", label.muni)) +
+      labs(y = 'Quantidade de médicos a cada\n100 mil habitantes', x = 'Ano', caption = 'Fonte: Elaboração própria. DataSUS(2021).') +
       theme_classic()+
       theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
             plot.title = element_text(hjust = 0.5))+
@@ -266,13 +262,15 @@ Medicos.Muni <- function(codigo_municipio){
     
     #grafico.med.100.mil
     
-    # salvar grÃ¡ficos
+    # salvar gráficos
     ggsave(plot = grafico.medico, path = diretorio, filename = arquivo.med, width = 9, height = 6)
     ggsave(plot = grafico.med.100.mil, path = diretorio, filename = arquivo.med.pop, width = 9, height = 6)
   }
 }
 
-# municipios <- c(110020,150060,150420)
-# Medicos.Muni(municipios) #cod com 6 dÃ­gitos 
+# municipios <- c(110020,150060)
+# Medicos.Muni(municipios) #cod com 6 dígitos
+# Leitos.Muni(municipios)
+# Estab.Muni(municipios)
 
 # Fonte: ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/ colar no windows explorer

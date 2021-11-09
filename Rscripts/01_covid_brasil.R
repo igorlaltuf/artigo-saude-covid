@@ -4,7 +4,7 @@ source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
 
-covid <- read.csv('Input/caso_full.csv', fileEncoding = 'UTF-8')
+covid <- read.csv('Input/caso_full.csv', encoding = 'UTF-8')
 
 covid <- covid %>% 
   dplyr::select(city_ibge_code,city,place_type,state,date,last_available_deaths,estimated_population) %>% 
@@ -30,8 +30,8 @@ mean(covid$obitos_100_mil_ha)
 tabela.covid <- gt(intermed) %>%
   cols_label(
     city = 'Município',
-    last_available_deaths = 'Quantidade de óbitos',
-    obitos_100_mil_ha = 'Quantidade de óbitos a cada 100 mil habitantes',
+    last_available_deaths = 'Quantidade de Óbitos',
+    obitos_100_mil_ha = 'Quantidade de Óbitos a cada 100 mil habitantes',
     class_obit_100_mil_ha = 'Classificação'
   ) %>% 
   cols_hide(
@@ -59,7 +59,7 @@ tabela.covid
 
 gtsave(tabela.covid, 'Outputs/tabelas/Covid_intermediadoras_classif_brasil.png')
 
-write.csv(covid,'Outputs/03_mapas/Saúde/covid_classificacao_brasil.csv')
+# write.csv(covid,'Outputs/03_mapas/Saúde/covid_classificacao_brasil.csv')
 
 mean(covid$obitos_100_mil_ha)
 
@@ -78,11 +78,11 @@ covid.shape$class_obit_100_mil_ha <- factor(covid.shape$class_obit_100_mil_ha, l
 coord.cidades <- st_read('Input/shapefiles/coord.cidades.shp')
 
 # Brasil
-# óbitos a cada 100 mil hab
+# Óbitos a cada 100 mil hab
 ggplot(covid.shape)+
   geom_sf(aes(fill=class_obit_100_mil_ha, geometry = geometry), colour = NA)+
-  scale_fill_manual(values = rev(brewer.pal(6,"BuPu")))+
-  labs(fill= 'Classificação dos óbitos a \n cada 100 mil habitantes', y=NULL, x=NULL) + #Muda o nome da legenda com o fill.
+  scale_fill_manual(values = rev(brewer.pal(6,"YlOrRd")))+
+  labs(fill= 'Classificação dos Óbitos a\ncada 100 mil habitantes', y=NULL, x=NULL) + #Muda o nome da legenda com o fill.
   coord_sf(crs = 4674) +
   annotation_scale(location = 'br')+
   annotation_north_arrow(location='tl', 

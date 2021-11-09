@@ -1,6 +1,6 @@
 # Funções Globais
 
-# 1 - Função de categorização dos dados
+# 1 - Função para categorizar os dados
 classificar.variavel <- function(dataframe, variavel.analisada = NULL, nova.variavel = NULL) {
   sym <- deparse(substitute(dataframe))
   if (!exists(sym, parent.frame())) stop("Dados passados não existe")
@@ -40,8 +40,8 @@ rm_accent <- function(str,pattern="all") {
   # str - vetor de strings que terão seus acentos retirados.
   # patterns - vetor de strings com um ou mais elementos indicando quais acentos deverão ser retirados.
   #            Para indicar quais acentos deverão ser retirados, um vetor com os símbolos deverão ser passados.
-  #            Exemplo: pattern = c("´", "^") retirará os acentos agudos e circunflexos apenas.
-  #            Outras palavras aceitas: "all" (retira todos os acentos, que são "´", "`", "^", "~", "¨", "ç")
+  #            Exemplo: pattern = c("?", "^") retirar? os acentos agudos e circunflexos apenas.
+  #            Outras palavras aceitas: "all" (retira todos os acentos, que s?o "?", "`", "^", "~", "?", "?")
   if(!is.character(str))
     str <- as.character(str)
   

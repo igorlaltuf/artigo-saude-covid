@@ -1,6 +1,6 @@
-# Evolu√ß√£o populacional por munic√≠pio - 2001 - 2020
+# EvoluÁ„o populacional por municÌpio - 2001 - 2020
 
-rm(list=ls()) # limpar as vari√°veis carregadas
+rm(list=ls()) # limpar as vari·veis carregadas
 source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')

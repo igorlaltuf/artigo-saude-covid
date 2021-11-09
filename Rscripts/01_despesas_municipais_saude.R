@@ -1,23 +1,23 @@
-# Despesas municipais com saÃºde na AmazÃ´nia Legal - Despesas empenhadas
-# Dados disponÃ­veis atÃ© 2012 sÃ£o sobre as receitas empenhadas. Por isso devo filtrar apenas essas receitas para os anos posteriores.
+# Despesas municipais com saúde na Amazônia Legal - Despesas empenhadas
+# Dados disponíveis até 2012 são sobre as receitas empenhadas. Por isso devo filtrar apenas essas receitas para os anos posteriores.
 
 source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
-options(scipen = 999) # remove notaÃ§Ã£o cientÃ­fica
+options(scipen = 999) # remove notação científica
 
-pop <- read_csv('Temp/populacao_amzl_2001-20.csv') # PopulaÃ§Ã£o - 2001 - 2020
-ipca <- read_excel('Input/ipca_indice.xlsx') #igp-di mÃ©dia anual
+pop <- read_csv('Temp/populacao_amzl_2001-20.csv') # População - 2001 - 2020
+ipca <- read_excel('Input/ipca_indice.xlsx') #igp-di média anual
 ipca.2020 <- ipca$media_numero_indice_ipca[27]
 
-# Despesas municipais por funÃ§Ã£o 2004-2018 (prÃ©-pandemia)
+# Despesas municipais por função 2004-2018 (pré-pandemia)
 # tabela para unir as duas bases
 equi.cod <- read_excel('Input/equivalencia entre codigos.xlsx') %>% 
   janitor::clean_names() %>% 
   unite("codigo_antigo", 5:6,sep = '') %>% 
   select('codigo_antigo','ibge_uf_muni_d','nome_ibge')
 
-# importar arquivos de 2004 atÃ© 2012
+# importar arquivos de 2004 até 2012
 lista.de.arquivos <- list.files(path = "Input/despesas municipais 2004-2012/", recursive = TRUE,
                                 pattern = "\\.csv$", full.names = TRUE)
 ano <- c(2004:2012)
@@ -65,25 +65,35 @@ desp.2018 <- desp.2018 %>% mutate(ano = 2018)
 
 dados.novos <- rbind(desp.2013,desp.2014,desp.2015,desp.2016,desp.2017,desp.2018) %>% 
   janitor::clean_names() %>% 
-  dplyr::filter(coluna %in% 'Despesas Empenhadas', # assim como os dados das despesas anteriores Ã  2013
-                conta %in% c('10 - SaÃºde','10.301 - AtenÃ§Ã£o BÃ¡sica','10.302 - AssistÃªncia Hospitalar e Ambulatorial',
-                             '10.303 - Suporte ProfilÃ¡tico e TerapÃªutico','10.304 - VigilÃ¢ncia SanitÃ¡ria',
-                             '10.305 - VigilÃ¢ncia EpidemiolÃ³gica','10.306 - AlimentaÃ§Ã£o e NutriÃ§Ã£o',
-                             '10.122 - AdministraÃ§Ã£o Geral','FU10 - Demais SubfunÃ§Ãµes')) %>% 
+  dplyr::filter(coluna %in% 'Despesas Empenhadas', # assim como os dados das despesas anteriores à 2013
+                conta %in% c('10 - Saúde',
+                             '10.301 - Atenção Básica',
+                             '10.302 - Assistência Hospitalar e Ambulatorial',
+                             '10.303 - Suporte Profilático e Terapeutico',
+                             '10.304 - Vigilância Sanitária',
+                             '10.305 - Vigilância Epidemiológica',
+                             '10.306 - Alimentação e Nutrição',
+                             '10.122 - Administração Geral',
+                             'FU10 - Demais Subfunções')) %>% 
   left_join(equi.cod,by = c('cod_ibge' = 'ibge_uf_muni_d')) %>% 
   select('nome_ibge','cod_ibge','ano','conta','valor') %>% 
   rename('despesa' = 'conta')
 
 base.saude <- rbind(dados.antigos, dados.novos) %>% 
   mutate(despesa = replace(despesa, 
-                           despesa == c('saude','atencao_basica','assistencia_hospitalar',
+                           despesa == c('saude',
+                                        'atencao_basica','assistencia_hospitalar',
                                         'suporte_profilatico','vigilancia_sanitaria',
                                         'vigilancia_epidemiologica','alimentacao_e_nutricao',
                                         'demais_subfuncoes_10'),
-                           c('10 - SaÃºde', '10.301 - AtenÃ§Ã£o BÃ¡sica','10.302 - AssistÃªncia Hospitalar e Ambulatorial',
-                             '10.303 - Suporte ProfilÃ¡tico e TerapÃªutico','10.304 - VigilÃ¢ncia SanitÃ¡ria',
-                             '10.305 - VigilÃ¢ncia EpidemiolÃ³gica','10.306 - AlimentaÃ§Ã£o e NutriÃ§Ã£o',
-                             'FU10 - Demais SubfunÃ§Ãµes'))) %>% 
+                           c('10 - Saúde',
+                             '10.301 - Atenção Básica',
+                             '10.302 - Assistência Hospitalar e Ambulatorial',
+                             '10.303 - Suporte Profilático e Terapeutico',
+                             '10.304 - Vigilância Sanitária',
+                             '10.305 - Vigilância Epidemiológica',
+                             '10.306 - Alimentação e Nutrição',
+                             'FU10 - Demais Subfunções'))) %>% 
   left_join(ipca, by = 'ano') %>% 
   left_join(pop, by = c('ano', 'cod_ibge'='cod_muni')) %>% 
   rename('valor_nominal' = 'valor') %>% 
@@ -95,29 +105,29 @@ base.saude <- rbind(dados.antigos, dados.novos) %>%
 # salvar o arquivo
 write.csv2(base.saude,'Temp/base_muni_saude_amzl.csv', row.names = F)
 
-# funÃ§Ã£o que consulta dados de despesas municipais na saÃºde
+# função que consulta dados de despesas municipais na saúde
 Saude.Muni <- function(codigo_municipio, tipo_despesa){
   
   for(i in codigo_municipio) {
   
-  if(tipo_despesa == '10 - SaÃºde') {label.desp <- 'saÃºde'}
-  if(tipo_despesa == '10.301 - AtenÃ§Ã£o BÃ¡sica') {label.desp <- 'atenÃ§Ã£o bÃ¡sica'}
-  if(tipo_despesa == '10.302 - AssistÃªncia Hospitalar e Ambulatorial') {label.desp <- 'assistÃªncia hospitalar e ambulatorial'}
-  if(tipo_despesa == '10.303 - Suporte ProfilÃ¡tico e TerapÃªutico') {label.desp <- 'suporte profilÃ¡tico e terapÃªutico'}
-  if(tipo_despesa == '10.304 - VigilÃ¢ncia SanitÃ¡ria') {label.desp <- 'vigilÃ¢ncia sanitÃ¡ria'}
-  if(tipo_despesa == '10.305 - VigilÃ¢ncia EpidemiolÃ³gica') {label.desp <- 'vigilÃ¢ncia epidemiolÃ³gica'}
-  if(tipo_despesa == '10.306 - AlimentaÃ§Ã£o e NutriÃ§Ã£o') {label.desp <- 'alimentaÃ§Ã£o e nutriÃ§Ã£o'}
-  if(tipo_despesa == 'FU10 - Demais SubfunÃ§Ãµes') {label.desp <- 'demais subfunÃ§Ãµes de saÃºde'}
+  if(tipo_despesa == '10 - Saúde') {label.desp <- 'saúde'}
+  if(tipo_despesa == '10.301 - Atenção Básica') {label.desp <- 'atenção básica'}
+  if(tipo_despesa == '10.302 - Assistência Hospitalar e Ambulatorial') {label.desp <- 'assistência hospitalar e ambulatorial'}
+  if(tipo_despesa == '10.303 - Suporte Profilático e Terapeutico') {label.desp <- 'suporte profilático e terapeutico'}
+  if(tipo_despesa == '10.304 - Vigilância Sanitária') {label.desp <- 'vigilância sanitária'}
+  if(tipo_despesa == '10.305 - Vigilância Epidemiológica') {label.desp <- 'vigilância epidemiológica'}
+  if(tipo_despesa == '10.306 - Alimentação e Nutrição') {label.desp <- 'alimentação e nutrição'}
+  if(tipo_despesa == 'FU10 - Demais Subfunções') {label.desp <- 'demais subfunções de saúde'}
   
   label.muni <- cidades.brasil.nome %>% 
     dplyr::filter(cod_muni %in% i) 
   label.muni <- cidades.brasil.nome[cidades.brasil.nome$cod_muni == i,2] # transformar em vetor ver regic script
   label.muni <- label.muni$muni # transforma em vetor
-  label.muni <- as.character(str_replace_all(label.muni,"[[:punct:]]","")) # essa vari?vel deve receber o nome da cidade de acordo com o c?digo colocado
+  label.muni <- as.character(str_replace_all(label.muni,"[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
   
-  arquivo.graf.nom <- paste('GrÃ¡fico desp nominal de',label.muni,'com',label.desp,'.png')
-  arquivo.graf.real <- paste('GrÃ¡fico desp real de',label.muni,'com',label.desp,'.png')
-  arquivo.graf.cap <- paste('GrÃ¡fico desp real per capita de',label.muni,'com',label.desp,'.png')
+  arquivo.graf.nom <- paste('Gráfico desp nominal de',label.muni,'com',label.desp,'.png')
+  arquivo.graf.real <- paste('Gráfico desp real de',label.muni,'com',label.desp,'.png')
+  arquivo.graf.cap <- paste('Gráficoo desp real per capita de',label.muni,'com',label.desp,'.png')
   arquivo.tabela <- paste('Tabela despesas de',label.muni,'.png')
   arquivo.csv <- paste('despesas de ', label.muni,'.csv', sep = '')
   diretorio <- paste0('Outputs/dados por municipio/',label.muni)
@@ -127,39 +137,39 @@ Saude.Muni <- function(codigo_municipio, tipo_despesa){
     dplyr::filter(cod_ibge %in% i,
                   despesa %in% tipo_despesa)  
   
-  # grÃ¡fico do valor nominal
+  # Gráfico do valor nominal
   graf.nominal <- ggplot(dados, aes(x=ano, y=valor_nominal/1000000)) +
     geom_line() +
     labs(x = 'Ano', y = 'Valor Nominal',
-         title = paste('EvoluÃ§Ã£o do valor empenhado das despesas municipais\ncom',label.desp,
-                       'em milhÃµes (R$)', 'no municÃ­pio de', label.muni)) +
+         title = paste('Evolução do valor empenhado das despesas municipais\ncom',label.desp,
+                       'em milhões (R$)', 'no município de', label.muni)) +
     scale_x_continuous(breaks = seq(2004, 2020, 2)) + 
     theme_classic()
    
-  # grÃ¡fico do valor real
+  # Gráfico do valor real
   graf.real <- ggplot(dados, aes(x=ano, y=valor_real/1000000)) +
     geom_line() +
     labs(x = 'Ano', y = 'Valor Real',
-         title = paste('EvoluÃ§Ã£o do valor empenhado das despesas municipais\ncom',label.desp,
-                       'em milhÃµes (R$ em valores de 2020)\n', 'no municÃ­pio de', label.muni)) +
+         title = paste('Evolução do valor empenhado das despesas municipais\ncom',label.desp,
+                       'em milhões (R$ em valores de 2020)\n', 'no município de', label.muni)) +
     scale_x_continuous(breaks = seq(2004, 2020, 2)) + 
     theme_classic()
 
-  # grÃ¡fico do valor real per capita
+  # Gráfico do valor real per capita
   graf.real.cap <- ggplot(dados, aes(x=ano, y=valor_real_per_capita)) +
     geom_line() +
     labs(x = 'Ano', y = 'Valor Real per Capita',
-         title = paste('EvoluÃ§Ã£o do valor empenhado das despesas municipais per capita\ncom',label.desp,
-                       '\n(R$ em valores de 2020) no municÃ­pio de', label.muni)) +
+         title = paste('Evolução do valor empenhado das despesas municipais per capita\ncom',label.desp,
+                       '\n(R$ em valores de 2020) no município de', label.muni)) +
     scale_x_continuous(breaks = seq(2004, 2020, 2)) + 
     theme_classic()
   
   # gerar tabela
   tabela.despesas <- gt(dados) %>%
     cols_label(
-      nome_ibge = 'MunicÃ­pio',
+      nome_ibge = 'Município',
       ano = 'Ano',
-      populacao = 'PopulaÃ§Ã£o',
+      populacao = 'População',
       valor_nominal = 'Valor Nominal',
       valor_real = 'Valor Real',
       valor_real_per_capita = 'Valor Real per Capita'
@@ -168,7 +178,7 @@ Saude.Muni <- function(codigo_municipio, tipo_despesa){
       columns = c('cod_ibge','despesa','nome_ibge','valor_nominal_per_capita')
     ) %>% 
     tab_header(
-      title = paste("EvoluÃ§Ã£o das despesas empenhadas com", label.desp ,"no municÃ­pio de",label.muni),
+      title = paste("Evolução das despesas empenhadas com", label.desp ,"no município de",label.muni),
       subtitle = 'valores em R$ entre 2004 e 2020.'
     ) %>%
     fmt_markdown(
@@ -183,11 +193,11 @@ Saude.Muni <- function(codigo_municipio, tipo_despesa){
     cols_align(
       align = 'center'
     ) %>% 
-    tab_source_note('Fonte: ElaboraÃ§Ã£o prÃ³pria. Tesouro Nacional (2021). Valor real deflacionado pela mÃ©dia do IPCA de 2020.')
+    tab_source_note('Fonte: Elaboração própria. Tesouro Nacional (2021). Valor real deflacionado pela média do IPCA de 2020.')
   
   tabela.despesas
   
-  # Salvar os grÃ¡ficos
+  # Salvar os gráficos
   ggsave(plot = graf.nominal, path = diretorio, filename = arquivo.graf.nom, width = 9, height = 6)
   ggsave(plot = graf.real, path = diretorio, filename = arquivo.graf.real, width = 9, height = 6)
   ggsave(plot = graf.real.cap, path = diretorio, filename = arquivo.graf.cap, width = 9, height = 6)
@@ -202,33 +212,9 @@ Saude.Muni <- function(codigo_municipio, tipo_despesa){
 }
 
 
-# falta apenas melhorar o alinhamento de tÃ­tulos, fontes etc
-# amostra <- c(1100205,1500602)
-# Saude.Muni(amostra,'10 - SaÃºde')
-
-# estabelecer metas para essa semana (DATASUS, receitas? etc)
-# filtrar a AMZL quando fizer a correlaÃ§Ã£o, remover zeros
-# juntar resultado daqui com dos royalties e calcular regressÃ£o
-
-# https://people.duke.edu/~rnau/411seas.htm
-# Continuar daqui: criar funÃ§Ã£o para automatizar
+ # amostra <- c(1100205,1500602)
+ # Saude.Muni(amostra,'10 - Saúde')
 
 
-# os gastos com saÃºde aumentaram, mesmo verificando per capita e deflacionando. Isso teria sido geral? (ver mais abaixo)
-# e para essas contas?
-# 10.302 - AssistÃªncia Hospitalar e Ambulatorial
-# 10.305 - VigilÃ¢ncia EpidemiolÃ³gica
-
-# evoluÃ§Ã£o do gasto em saÃºde sobre o total da arrecadaÃ§Ã£o do municÃ­pio (receita tributÃ¡ria)
-
-# pegar um ano e classificar a proporÃ§Ã£o do gasto com saÃºde sobre a receita tributÃ¡ria, classificar e comparar com outras cidades
-# classificar com cut()
-# Usar como exemplo:
-# https://www.r-graph-gallery.com/web-line-chart-with-labels-at-end-of-line.html
-
-
-# ver como fazer isso de forma paralela usando o processador
-# Importante: os dados de saÃºde nÃ£o incluem gastos com pessoal atÃ© 2012
-# 
 # Fonte anterior a 2013
 # https://www.tesourotransparente.gov.br/publicacoes/finbra-dados-contabeis-dos-municipios-1989-a-2012/2012/26

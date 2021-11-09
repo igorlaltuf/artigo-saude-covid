@@ -1,16 +1,16 @@
-# Regress√£o Linear
-rm(list=ls()) # limpar as vari√°veis carregadas
+# Regress„o Linear
+rm(list=ls()) 
 source('Rscripts/00_bibliotecas.R')
 source('Rscripts/00_variaveis_globais.R')
 source('Rscripts/00_funcoes_globais.R')
-options(scipen = 999) # remove nota√ß√£o cient√≠fica
+options(scipen = 999) # remove notaÁ„o cientÌfica
 
 # Valores deflacionados em valores de 2020 para mostrar o que realmente varia (isso tira aquele problema dos anos)
 
 # Para o ano de 2018
 despesas.2018 <- read.csv2('Temp/base_muni_saude_amzl.csv') %>% 
   dplyr::filter(ano == 2018, 
-                despesa %in% '10 - Sa√∫de',
+                despesa %in% '10 - Sa˙de',
                 cod_ibge %in% cidades.amazonia.legal)
 royalties.2018 <- read.csv2('Temp/base_royalties_amzl.csv') %>% 
   dplyr::filter(ano == 2018,
@@ -28,30 +28,25 @@ modelo <- lm(formula = valor_saude~valor_royalties, data = dados)
 summary(modelo)
 
 
-# gr√°fico
+# gr·fico
 library(ggplot2)
-library(ggpubr) # pacote para colocar a equa√ß√£o no gr√°fico
+library(ggpubr) # pacote para colocar a equaÁ„o no gr·fico
 x <- as.data.frame(dados)
 ggplot(x, aes(x = valor_royalties, y = valor_saude)) +
   geom_point(shape = 21,
              color = 'dodgerblue4',
              fill = 'deepskyblue1',
              size = 3) +
-  geom_smooth(method = 'lm', # adiciona a reta de regress√£o pelo m√©todo de regress√£o linear
-              formula = y~x, # como eu j√° informei x e y em ggplot(x, aes(x = DriversKilled, y = PetrolPrice)), eu s√≥ preciso informar que y est√° em fun√ß√£o de x
-              # ou seja, DriversKilled est√° em fun√ß√£o de PetroPrice
-              se = F, # faixa sombreada em volta da reta √© o intervalo de confian√ßa (remove com se = F).
+  geom_smooth(method = 'lm', # adiciona a reta de regress„o pelo mÈtodo de regress„o linear
+              formula = y~x, # como eu j· informei x e y em ggplot(x, aes(x = DriversKilled, y = PetrolPrice)), eu apenas preciso informar que y est· em funÁ„o de x
+              # ou seja, DriversKilled est· em funÁ„o de PetroPrice
+              se = F, # faixa sombreada em volta da reta È o intervalo de confianÁa (remove com se = F).
               col = 'darkred') + # cor da reta
-  # mostrar a equa√ß√£o da reta no gr√°fico com a fun√ß√£o stat_regline_equation()
-  stat_regline_equation(aes(label = paste(..eq.label.., # palavra reservada do R para equa√ß√£o 
-                                          ..rr.label.., # palavra reservada do R para o R¬≤ 
-                                          sep = '~'))) + # ~ √© o s√≠mbolo usado para dar espa√ßo nas equa√ß√µes
+  # mostrar a equaÁ„o da reta no gr·fico com a funÁ„o stat_regline_equation()
+  stat_regline_equation(aes(label = paste(..eq.label.., # palavra reservada do R para equaÁ„o 
+                                          ..rr.label.., # palavra reservada do R para o R≤ 
+                                          sep = '~'))) + # ~ È o simbolo usado para dar espaÁo nas equaÁıes
   theme_classic()
-
-
-
-
-
 
 
 
@@ -71,7 +66,7 @@ dados.alta <- left_join(desp.alta, royalt.alta, by = 'ano') %>%
   rename('desp_saude_real' = 'valor_real.x',
          'royalties_real' = 'valor_real.y')
   
-# confirmar se fiz correto!
+# teste
 lm(data = dados.alta, formula = desp_saude_real~royalties_real)
 
 
