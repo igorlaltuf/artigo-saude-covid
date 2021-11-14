@@ -25,7 +25,8 @@ source('Rscripts/01_royalties.R')
 
 
 # geobr::lookup_muni(name_muni = 'Itaituba')
-municipios <- c(1100205,1500602,1504208,1505536,1502152,1505304,1503903,1302603,1505437,1503606)
+municipios <- c(1100205,1500602,1504208,1505536,1502152,1505304,1503903,1302603,1505437,1503606,1508357)
+
 
 Dados.Royalties(municipios,'Royalties - CFM') # transferências com royalties
 Dados.Royalties(municipios,'Royalties - CFH') # transferências com royalties
