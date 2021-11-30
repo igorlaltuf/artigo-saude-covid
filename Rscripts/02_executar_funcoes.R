@@ -25,7 +25,17 @@ source('Rscripts/01_royalties.R')
 
 
 # geobr::lookup_muni(name_muni = 'Itaituba')
-municipios <- c(1100205,1500602,1504208,1505536,1502152,1505304,1503903,1302603,1505437,1503606,1508357)
+# Seis municípios que receberam mais royalties de energia
+muni.energia <- c(1100205,1505064,1508100,1503093,1500602,1508357)
+# Seis municípios que receberam mais royalties de mineração
+muni.mineracao <- c(1505536,1502152,1504208,1505502,1600402,1505304)
+
+# seleção nova (6 maiores de cada):
+municipios <- c(1100205,1505064,1508100,1503093,1500602,1508357,1505536,
+                1502152,1504208,1505502,1600402,1505304)
+
+# seleção antiga de municípios
+# municipios <- c(1100205,1500602,1504208,1505536,1502152,1505304,1503903,1302603,1505437,1503606,1508357)
 
 
 Dados.Royalties(municipios,'Royalties - CFM') # transferências com royalties

@@ -63,6 +63,23 @@ tabela.covid <- gt(intermed) %>%
 tabela.covid
 gtsave(tabela.covid, 'Outputs/tabelas/tabela_covid_intermediadoras.png')
 
+
+# dados dos 6 maiores
+
+x <- covid.amzl %>% 
+  dplyr::filter(city_ibge_code %in% c(1100205,1505064,1508100,1503093,1500602,1508357,1505536,1502152,1504208,1505502,1600402,1505304))
+
+
+
+
+
+
+
+
+
+
+
+
 # Mapa da COVID-19 na Amazônia Legal com classificação restrita a essa região
 shape.muni.amzl <- read_sf('Input/shapefiles/shape.muni.amzl.shp')
 shape.muni.amzl <- left_join(covid.amzl,shape.muni.amzl, by = c('city_ibge_code'='cd_mn'))
@@ -74,13 +91,25 @@ shape.muni.amzl$class_obit_100_mil_ha <- factor(shape.muni.amzl$class_obit_100_m
 # coordenadas dos pontos
 coord.cidades <- st_read('Input/shapefiles/coord.cidades.shp')
 
+
+coord.energia <- geobr::read_municipal_seat(showProgress = T) %>% 
+  dplyr::filter(code_muni %in% c(1100205,1505064,1508100,1503093,1500602,1508357))
+coord.mineracao <- geobr::read_municipal_seat(showProgress = T) %>%
+  dplyr::filter(code_muni %in% c(1505536,1502152,1504208,1505502,1600402,1505304))
+
+#geobr::lookup_muni('parauapebas')
+
 # plotar mapa com Óbitos a cada 100 mil hab
 ggplot(shape.muni.amzl)+
   geom_sf(aes(fill=class_obit_100_mil_ha, geometry = geometry), colour = NA)+
   scale_fill_manual(values = rev(brewer.pal(6,"YlOrRd")))+
- # geom_point(data = coord.cidades, aes(geometry = geometry), stat = "sf_coordinates")+
- # geom_sf_text(data = coord.cidades, aes(label = mn), colour='grey10',vjust=1.3, size = 1.8) +
-  labs(fill= 'Classificação dos Óbitos a\n cada 100 mil habitantes', y=NULL, x=NULL) + #Muda o nome da legenda com o fill.
+  #geom_point(data = coord.energia, aes(geometry = geom, col = 'Energia'), stat = "sf_coordinates", size = 1.5, colour = '#8856a7')+
+  #geom_point(data = coord.mineracao, aes(geometry = geom, col = 'Mineração'), stat = "sf_coordinates", size = 1.5, colour = '#2ca25f')+
+  #geom_sf_text(data = coord.energia, aes(label = name_muni), colour='grey10',vjust=1.7, size = 1.5) +
+  #geom_sf_text(data = coord.mineracao, aes(label = name_muni), colour='grey10',vjust=1.7, size = 1.5) +
+  labs(fill= NULL, y=NULL, x=NULL) + #Muda o nome da legenda com o fill.
+  #scale_color_manual(values = c("Royalties Energia" = '#8856a7','Royalties Energia' = '#2ca25f')) +
+  scale_color_manual(values = c("#D34945","#9045D3","#45CFD3","#88D345"))+
   coord_sf(crs = 4674) +
   annotation_scale(location = 'br')+
   annotation_north_arrow(location='tl', 
@@ -88,7 +117,7 @@ ggplot(shape.muni.amzl)+
   theme_classic()+ # retira o grid e coloca o fundo branco
   theme(legend.position = 'bottom')
 
-ggsave('Outputs/mapas/covid_obitos_amzl.png', width = 9, height = 6)
+ggsave('Outputs/mapas/covid_obitos_amzl.png', width = 9, height = 6, scale = 1.5)
 
 
 # Óbitos da COVID nas cidades selecionadas

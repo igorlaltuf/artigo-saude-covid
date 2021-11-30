@@ -24,7 +24,8 @@ dados <- left_join(royalties.2018, despesas.2018, by = c('ano','codigo_ibge' = '
 
 cor(dados)
 
-modelo <- lm(formula = valor_saude~valor_royalties, data = dados)
+# log1p() natural logarithm of a given number or set of numbers apliquei pq 
+modelo <- lm(formula = log1p(valor_saude)~log1p(valor_royalties), data = dados)
 summary(modelo)
 
 
@@ -46,7 +47,12 @@ ggplot(x, aes(x = valor_royalties, y = valor_saude)) +
   stat_regline_equation(aes(label = paste(..eq.label.., # palavra reservada do R para equação 
                                           ..rr.label.., # palavra reservada do R para o R² 
                                           sep = '~'))) + # ~ é o simbolo usado para dar espaço nas equações
-  theme_classic()
+  theme_classic()+
+  # scale_y_continuous(trans = 'log10') + # experimento de colocar as escalas na base de log 10
+  # scale_x_continuous(trans = 'log10') 
+  scale_x_continuous(trans = scales::log_trans()) + # logaritmo neperiano
+  scale_y_continuous(trans = scales::log_trans())   # logaritmo neperiano
+
 
 
 
