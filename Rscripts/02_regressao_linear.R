@@ -12,12 +12,13 @@ despesas.2018 <- read.csv2('Temp/base_muni_saude_amzl.csv') %>%
   dplyr::filter(ano == 2018, 
                 despesa %in% '10 - Saúde',
                 cod_ibge %in% cidades.amazonia.legal)
+
 royalties.2018 <- read.csv2('Temp/base_royalties_amzl.csv') %>% 
   dplyr::filter(ano == 2018,
                 codigo_ibge %in% cidades.amazonia.legal,
                 transferencia == 'Royalties - CFH')
 
-dados <- left_join(royalties.2018, despesas.2018, by = c('ano','codigo_ibge' = 'cod_ibge')) %>% 
+dados <- left_join(royalties.2018, despesas.2018, by = c('ano', 'codigo_ibge' = 'cod_ibge')) %>% 
   select(1,8,6,13) %>% # selecionar valores deflacionados
   rename('valor_royalties' = 'valor_real.x',
          'valor_saude' = 'valor_real.y')

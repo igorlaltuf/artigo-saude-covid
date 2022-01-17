@@ -62,7 +62,7 @@ shape.amzl <- read_amazon()
 ggplot()+
   geom_sf(data = shape.amzl, aes(geometry = geom), fill = NA) + 
   geom_sf(data = shape.selec, aes(fill=class_obit_100_mil_ha, geometry = geometry), colour = NA) +
-  scale_fill_manual(values = rev(brewer.pal(6,"YlOrRd")))+
+  scale_fill_manual(values = rev(brewer.pal(6,"Greys")))+
   #geom_point(data = coord.energia, aes(geometry = geom, col = 'Energia'), stat = "sf_coordinates", size = 1.5, colour = '#8856a7')+
   #geom_point(data = coord.mineracao, aes(geometry = geom, col = 'Mineração'), stat = "sf_coordinates", size = 1.5, colour = '#2ca25f')+
   #geom_sf_text(data = coord.energia, aes(label = name_muni), colour='grey10',vjust=1.7, size = 1.5) +
@@ -77,7 +77,7 @@ ggplot()+
   theme_classic()+ # retira o grid e coloca o fundo branco
   theme(legend.position = 'bottom')
 
-ggsave('Outputs/mapas/covid_muni_terras_ind.png', width = 9, height = 6)
+ggsave('Outputs/mapas/covid_muni_terras_ind_grey.png', width = 9, height = 6, dpi = 600)
 
 
 

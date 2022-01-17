@@ -15,11 +15,17 @@ covid <- covid %>%
 
 covid <- classificar.variavel(covid,'obitos_100_mil_ha','class_obit_100_mil_ha')
 
+am <- covid %>% 
+  dplyr::filter(state %in% 'AM')
+
+grandes.muni <- covid %>% 
+  arrange(desc(estimated_population))
+  
 intermed <- covid %>% 
   dplyr::filter(city_ibge_code %in% cidades.intermediadoras) %>% 
   arrange(desc(obitos_100_mil_ha))
 
-x <- covid %>% 
+x <- am %>% 
   group_by(class_obit_100_mil_ha) %>%
   mutate(N_category = n()) %>%
   count(N_category)

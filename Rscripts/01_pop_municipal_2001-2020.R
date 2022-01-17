@@ -24,8 +24,10 @@ populacao <- left_join(pop.2005.2019,pop.2010) %>%
   rename('cod_muni' = 'cod',
          'muni' = 'municipio') %>% 
   select(1,2,22,3:8,24,9,10,21,11:20) %>% 
-  janitor::clean_names() %>% 
-  dplyr::filter(cod_muni %in% cidades.amazonia.legal)
+  janitor::clean_names() 
+
+# %>% 
+#   dplyr::filter(cod_muni %in% cidades.amazonia.legal)
 
 # converter em numeric
 populacao[4:23] <- lapply(populacao[4:23], as.numeric)
@@ -41,5 +43,5 @@ populacao <- populacao %>%
 populacao$ano<-as.numeric(sub(".", "", populacao$ano))
 
 # exportar csv com dados populacionais
-con <- file('Temp/populacao_amzl_2001-20.csv', encoding="UTF-8")
-write.csv(populacao, file = con, row.names = F)
+con <- file('Temp/pop_muni_br_2000-20.csv', encoding="UTF-8") # para exportar em utf-8
+write.csv2(populacao, file = con, row.names = F)

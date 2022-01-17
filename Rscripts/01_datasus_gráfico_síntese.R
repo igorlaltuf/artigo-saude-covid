@@ -38,7 +38,8 @@ dados.st <- do.call(rbind, lapply(paste0("estabelec.", 2005:2020),get)) %>%
 # Função que retorna os dados: usar o código do município com apenas com 6 dígitos
 # Função que retorna a evolução da quantidade de hospitais municipais e estaduais
 
-Estab.Muni <- function(codigo_municipio){
+Estab.Muni.Sintese <- function(codigo_municipio){
+  contador = 1
   for(i in codigo_municipio){
   dados <- dados.st %>% 
     dplyr::filter(codufmun %in% i,
@@ -47,33 +48,54 @@ Estab.Muni <- function(codigo_municipio){
                   vinc_sus == 1) %>%  # vinculados ao SUS
     group_by(ano) %>% 
     count()
-  
+ 
   label.muni <- cidades.brasil.nome[substr(cidades.brasil.nome$cod_muni,1,6) == i,2] # transformar em vetor ver regic script
   label.muni <- label.muni$muni # transforma em vetor
   label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
   arquivo.hospitais <- paste('Hosp muni e est em ', label.muni,'.png')
-  diretorio <- paste0('Outputs/dados por municipio/',label.muni)
+  arquivo.hosp.sintese <- paste('Hosp Munic e Estad.png')
+  diretorio <- paste0('Outputs/dados por municipio/')
   dir.create(diretorio)
+ 
+  label.title <- cidades.brasil.nome[substr(cidades.brasil.nome$cod_muni,1,6) == i,2]
+ 
   
   # gerar  gráfico
-  grafico.estabelecimentos <- ggplot() +
-    geom_bar(dados, mapping = aes(x = ano, y = n), col = '#00a2ed', fill = '#00a2ed', stat = 'identity') +
-    ggtitle(paste("Hospitais vinculados ao SUS com gestão\nmunicipal, estadual ou dupla - ", label.muni)) +
-    labs(y = 'Quantidade de hospitais', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
-    theme_classic()+
+  graf.estab <- ggplot() +
+    geom_bar(dados, width = 0.8, mapping = aes(x = ano, y = n), col = '#bdd7e7', fill = '#bdd7e7', stat = 'identity') +
+    ggtitle(label.title) +
+    labs(y = 'Quantidade\nde hospitais', x = 'Ano') +
+    theme_classic() +
     theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
-          plot.title = element_text(hjust = 0.5))+
-    scale_y_continuous(breaks = seq(0, max(dados$n), 1))+
-    scale_x_continuous(breaks = seq(2005, 2020, 1))
+          plot.title = element_text(hjust = 0.5)) +
+    scale_x_continuous(breaks = seq(2006, 2020, 2))
+    # scale_y_continuous(breaks = seq(0, max(dados$n), 1)) 
     
-  grafico.estabelecimentos
-  ggsave(plot = grafico.estabelecimentos, path = diretorio, filename = arquivo.hospitais, width = 9, height = 6)
+  # ifelse(max(dados$n)>5, assign(breaks.eixo.y,2), assign(breaks.eixo.y,1))
   
-  }}
+  breaks.eixo.y <- if(max(dados$n)>5) 2 else 1
+  
+  
+  graf.estab <- graf.estab +
+    scale_y_continuous(breaks = seq(0, max(dados$n), breaks.eixo.y))
+  
+  assign(paste0("graf.estab", contador), graf.estab)
+  contador = contador + 1
+  }
+  
+  graf.sintese <- (graf.estab1|graf.estab2)/
+                  (graf.estab3|graf.estab4)/
+                  (graf.estab5|graf.estab6)
+  
+  graf.sintese
+
+  ggsave(plot = graf.sintese, path = diretorio, filename = arquivo.hosp.sintese, width = 7.5, height = 9)
+  
+  }
 
 
-# amostra <- c(110020,150060) # Lembrar que o código aqui é de 6 dígitos
-# Estab.Muni(amostra)
+ amostra <- c(150553,150215,150420,150550,160040,150530) # Lembrar que o código aqui é de 6 dígitos
+ Estab.Muni.Sintese(amostra)
 
 
 # 2 - Dados de leitos (2005 - 2020) - valores para todos os leitos, e não apenas os leitos de internação.
@@ -100,58 +122,49 @@ dados.lt <- do.call(rbind, lapply(paste0("leito.", 2005:2020),get)) %>%
 
 pop$cod_muni <- as.numeric(substr(pop$cod_muni,1,6))
 
-dados.lt <- left_join(dados.lt, pop, by = c('codufmun' = 'cod_muni', 'ano')) %>%  
-  select('ano','codufmun','qt_sus','populacao') %>% 
-  group_by(ano,codufmun,populacao) %>%   
+dados.lt <- left_join(dados.lt, pop, by = c('codufmun' = 'cod_muni', 'ano')) %>% 
+  select('ano','codufmun','muni','qt_sus','populacao') %>% 
+  group_by(ano,codufmun,muni,populacao) %>%   
   summarise(leitos_sus = sum(qt_sus)) %>% 
   mutate(leitos_cada_100_mil_ha = (leitos_sus/populacao)*100000)
 
 
+seis.maiores.minerac <- c(150553,150215,150420,150550,160040,150530)
 
-Leitos.Muni <- function(codigo_municipio){
-  for(i in codigo_municipio){
-    dados <- dados.lt %>% 
-      dplyr::filter(codufmun %in% i)
-    
-    label.muni <- cidades.brasil.nome[substr(cidades.brasil.nome$cod_muni,1,6) == i,2] # transformar em vetor ver regic script
-    label.muni <- label.muni$muni # transforma em vetor
-    label.muni <- as.character(str_replace_all(label.muni, "[[:punct:]]","")) # essa variável deve receber o nome da cidade de acordo com o código colocado
-    arquivo.leitos <- paste('Leitos do SUS em ', label.muni,'.png')
-    arquivo.leitos.pop <- paste('Leitos do SUS 100 mil hab ', label.muni,'.png')
-    diretorio <- paste0('Outputs/dados por municipio/',label.muni)
-    dir.create(diretorio)
-    
-    # gerar gráfico qtd leitos
-    grafico.leitos <- ggplot() +
-      geom_bar(dados, mapping = aes(x = ano, y = leitos_sus), col = '#00a2ed', fill = '#00a2ed', stat = 'identity') +
-      ggtitle(paste("Evolução dos leitos do SUS - ", label.muni)) +
-      labs(y = 'Quantidade de leitos', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
-      theme_classic()+
-      theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
-            plot.title = element_text(hjust = 0.5))+
-      scale_x_continuous(breaks = seq(2005, 2020, 1))
-    
-    grafico.leitos
-    ggsave(plot = grafico.leitos, path = diretorio, filename = arquivo.leitos, width = 9, height = 6)
-    
-   
-    # leitos do sus cada 100 mil hab (independentemente se são do município ou não)
-    grafico.leitos.pop <- ggplot() +
-      geom_bar(dados, mapping = aes(x = ano, y = leitos_cada_100_mil_ha), col = '#00a2ed', fill = '#00a2ed', stat = 'identity') +
-      ggtitle(paste("Evolução dos leitos do SUS a cada 100 mil habitantes - ", label.muni)) +
-      labs(y = 'Quantidade de leitos a\ncada 100 mil habitantes', x = 'Ano', caption = 'Fonte: Elaboração própria. SALDANHA Et al.(2019).') +
-      theme_classic()+
-      theme(plot.caption = element_text(hjust = 0, face= "italic"), #Default is hjust=1
-            plot.title = element_text(hjust = 0.5))+
-      scale_x_continuous(breaks = seq(2005, 2020, 1))
-    
-    grafico.leitos.pop
-    ggsave(plot = grafico.leitos.pop, path = diretorio, filename = arquivo.leitos.pop, width = 9, height = 6)
-    
-  }}
+dados.lt.minerac <- dados.lt %>% 
+  dplyr::filter(codufmun %in% seis.maiores.minerac)
 
-#Leitos.Muni(110020)
-#debug(Leitos.Muni)
+x <- ggplot() +
+     geom_line(data = dados.lt.minerac, aes(x=ano, y=leitos_cada_100_mil_ha, group = muni, colour = muni)) +
+     geom_point(data = dados.lt.minerac, aes(x=ano, y=leitos_cada_100_mil_ha, group = muni), size = .8) +
+     labs(x = 'Ano', y = "Leitos a cada 100 mil habitantes") +
+     scale_x_continuous(breaks = seq(2005, 2020, 3)) +
+     scale_y_continuous(breaks = seq(0, max(dados.lt.minerac$leitos_cada_100_mil_ha), 50)) +
+     theme_classic() +
+     theme(legend.position = "bottom",
+           legend.title = element_blank())
+  
+
+# salvar
+ggsave(plot = x, path = diretorio, filename = 'evol leitos minerac.png', width = 9, height = 6)
+
+
+seis.maiores.energia <- c(110020,150506,150810,150309,150060,150835)
+dados.lt.energia <- dados.lt %>% 
+  dplyr::filter(codufmun %in% seis.maiores.energia)
+
+y <- ggplot() +
+     geom_line(data = dados.lt.energia, aes(x=ano, y=leitos_cada_100_mil_ha, group = muni, colour = muni)) +
+     geom_point(data = dados.lt.energia, aes(x=ano, y=leitos_cada_100_mil_ha, group = muni), size = .8) +
+     labs(x = 'Ano', y = "Leitos a cada 100 mil habitantes") +
+     scale_x_continuous(breaks = seq(2005, 2020, 3)) +
+     scale_y_continuous(breaks = seq(0, max(dados.lt.energia$leitos_cada_100_mil_ha), 50)) +
+     theme_classic() +
+     theme(legend.position = "bottom",
+           legend.title = element_blank())
+
+# salvar
+ggsave(plot = y, path = diretorio, filename = 'evol leitos energia.png', width = 9, height = 6)
 
 
 # 3 - Dados de médicos do sus (2005 - 2020)
@@ -221,7 +234,48 @@ while (i<=length(lista.de.arquivos)) {
   i <- i + 1
 }
 
-dados <- do.call(rbind, lapply(paste0("cnes.pf.",1:135),get))
+dados <- do.call(rbind, lapply(paste0("cnes.pf.", 1:135), get))
+
+
+dados.prof.energia <- dados %>% 
+  dplyr::filter(codufmun %in% seis.maiores.energia)
+
+m <- ggplot() +
+  geom_line(data = dados.prof.energia, aes(x=ano, y=med_sus_100_mil_hab, group = muni, colour = muni)) +
+  geom_point(data = dados.prof.energia, aes(x=ano, y=med_sus_100_mil_hab, group = muni), size = .8) +
+  labs(x = 'Ano', y = "Médicos a cada 100 mil habitantes") +
+  scale_x_continuous(breaks = seq(2005, 2020, 3)) +
+  scale_y_continuous(breaks = seq(0, max(dados.prof.energia$med_sus_100_mil_hab), 50)) +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank())
+
+m
+
+# salvar
+ggsave(plot = m, path = diretorio, filename = 'evol medicos energia.png', width = 9, height = 6)
+
+
+
+dados.prof.minerac <- dados %>% 
+  dplyr::filter(codufmun %in% seis.maiores.minerac)
+
+n <- ggplot() +
+  geom_line(data = dados.prof.minerac, aes(x=ano, y=med_sus_100_mil_hab, group = muni, colour = muni)) +
+  geom_point(data = dados.prof.minerac, aes(x=ano, y=med_sus_100_mil_hab, group = muni), size = .8) +
+  labs(x = 'Ano', y = "Médicos a cada 100 mil habitantes") +
+  scale_x_continuous(breaks = seq(2005, 2020, 3)) +
+  scale_y_continuous(breaks = seq(0, max(dados.prof.minerac$med_sus_100_mil_hab), 50)) +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank())
+
+n
+
+# salvar
+ggsave(plot = n, path = diretorio, filename = 'evol medicos minerac.png', width = 9, height = 6)
+
+
 
 
 # médicos do sus por município (estadual, municipal ou dupla)

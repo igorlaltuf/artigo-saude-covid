@@ -8,6 +8,7 @@ source('Rscripts/00_funcoes_globais.R')
 
 #--- scripts das funções
 source('Rscripts/01_datasus.R')
+source('Rscripts/01_datasus_gráfico_síntese.R')
 source('Rscripts/01_despesas_municipais_saude.R')
 source('Rscripts/01_royalties.R')
 
@@ -44,6 +45,10 @@ Saude.Muni(municipios,'10 - Saúde') # despesas municipais com saúde
 
 municipios <-  as.numeric(substr(municipios,1,6)) # muda para 6 dígitos para passar no datasus
 Estab.Muni(municipios)  # estabelecimentos de saúde
+
+Estab.Muni.Sintese(muni.energia)
+Estab.Muni.Sintese(muni.mineracao)
+
 Leitos.Muni(municipios) # leitos do sus (de todos os tipos)
 Medicos.Muni(municipios) # quantidade de médicos por municipio
 
